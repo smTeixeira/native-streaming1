@@ -1,3 +1,4 @@
+import { useNavigation } from "expo-router";
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -16,6 +17,8 @@ const CreatePassword = () => {
   const [error, setError] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     const storedEmail = "example@example.com";
@@ -68,7 +71,7 @@ const CreatePassword = () => {
           </View>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => console.log("Próximo passo")}
+            onPress={() => navigation.navigate("Signature")}
           >
             <Text style={styles.buttonText}>Próximo passo</Text>
             <Icon name="arrow-right" size={26} color="#000" />
