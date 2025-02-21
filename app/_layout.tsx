@@ -5,6 +5,9 @@ import LoginPage from './screens/Login';
 import RegisterPage from './screens/RegisterScreen';
 import Passwordpage from './screens/CreatedPassword';
 import Signature from './screens/Signature';
+import Home from './screens/Home';
+import VideoPlayer from './screens/VideoPlayer';
+import ForgotPasswordPage from './screens/ForgotPassword';
 
 const Stack = createStackNavigator();
 
@@ -17,6 +20,9 @@ export default function AppNavigator() {
         <Stack.Screen  name="Register" component={RegisterPage} options={{ headerShown: false }} />
         <Stack.Screen  name="Password" component={Passwordpage} options={{ headerShown: false }} />
         <Stack.Screen  name="Signature" component={Signature} options={{ headerShown: false }} />
+        <Stack.Screen  name="Home" component={Home} options={{ headerShown: false }} />
+        <Stack.Screen  name="VideoPlayer" component={VideoPlayer} options={{ headerShown: false }} />
+        <Stack.Screen  name="ForgotPassword" component={ForgotPasswordPage} options={{ headerShown: false }} />
       </Stack.Navigator>
     </>
   );

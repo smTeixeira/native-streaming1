@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { View, TextInput, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useRef } from "react";
+import { View, TextInput, StyleSheet, Keyboard } from "react-native";
 
 interface ConfirmationCodeInputProps {
   length: number;
@@ -28,17 +28,12 @@ const AddCode = ({ length, onComplete }: ConfirmationCodeInputProps) => {
     }
   };
 
-  const handleKeyDown = (e: any, index: number) => {
-    if (e.nativeEvent.key === "Backspace" && !values[index] && index > 0) {
+  const handleKeyPress = (
+    { nativeEvent: { key } }: { nativeEvent: { key: string } },
+    index: number
+  ) => {
+    if (key === "Backspace" && !values[index] && index > 0) {
       inputsRef.current[index - 1]?.focus();
-    }
-  };
-
-  const handleSubmit = () => {
-    if (values.every((val) => val !== "")) {
-      onComplete(values.join(""));
-    } else {
-      setError("Todos os campos devem ser preenchidos.");
     }
   };
 
@@ -54,53 +49,44 @@ const AddCode = ({ length, onComplete }: ConfirmationCodeInputProps) => {
             style={[styles.input, error ? styles.inputError : null]}
             value={value}
             onChangeText={(text) => handleChange(text, index)}
-            onKeyPress={(e) => handleKeyDown(e, index)}
+            onKeyPress={(e) => handleKeyPress(e, index)}
             maxLength={1}
             keyboardType="numeric"
+            placeholder="0"
+            placeholderTextColor="#999"
           />
         ))}
       </View>
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+      {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   inputsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
   },
   input: {
     width: 40,
-    height: 48,
+    height: 50,
     borderBottomWidth: 1,
-    borderBottomColor: 'white',
-    color: 'white',
+    borderColor: "#FFF",
+    color: "#FFF",
     fontSize: 24,
-    textAlign: 'center',
+    textAlign: "center",
   },
   inputError: {
-    borderBottomColor: 'red',
+    borderColor: "red",
   },
   errorText: {
-    color: 'red',
+    color: "red",
     fontSize: 14,
-    marginBottom: 8,
-  },
-  submitButton: {
-    backgroundColor: 'white',
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  submitButtonText: {
-    color: 'black',
-    fontSize: 16,
-    fontWeight: 'bold',
+    textAlign: "center",
   },
 });
 

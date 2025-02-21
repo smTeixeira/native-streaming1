@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import Login from '@/components/Login/index';
+import ForgotPassword from '@/components/ForgotPassaword';
 
-const LoginPage = () => {
+const ForgotPasswordPage = () => {
   return (
     <View style={styles.container}>
       <View style={styles.backgroundContainer}>
@@ -21,7 +22,7 @@ const LoginPage = () => {
       </View>
 
       <View style={styles.contentContainer}>
-        <Login /> 
+        <ForgotPassword onCancel={() => {}} /> 
       </View>
     </View>
   );
@@ -71,4 +72,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginPage;
+export default ForgotPasswordPage;

@@ -1,6 +1,6 @@
+import Planos from '@/components/Signature/Signature';
 import React from 'react';
 import { View, Image, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import Planos from '@/components/Signature/Signature'; 
 
 const Signature = () => {
   return (
@@ -23,7 +23,7 @@ const Signature = () => {
       <View style={styles.content}>
         <Planos />
       </View>
-    </View>
+    </View> 
   );
 };
 

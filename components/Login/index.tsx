@@ -43,7 +43,7 @@ const Login = () => {
     if (validateForm()) {
       console.log('Email:', email);
       console.log('Password:', password);
-      Alert.alert('Sucesso', 'Login realizado com sucesso!');
+      navigation.navigate('Home');
     }
   };
 

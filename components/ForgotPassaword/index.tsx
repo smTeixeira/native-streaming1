@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
-import MaskInput  from 'react-native-mask-input';
-import Buttons from '../Buttons/index';
-import ConfirmCode from './confirmCode';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
+import { useNavigation } from "expo-router";
+import MaskInput from "react-native-mask-input";
+import Buttons from "../Buttons/buttons";
+import ConfirmCode from "./confirmCode";
 
 interface ForgotPasswordProps {
   onCancel: () => void;
@@ -17,7 +23,7 @@ export const ForgotPassword = ({ onCancel }: ForgotPasswordProps) => {
   const [showCellCode, setShowCellCode] = useState(false);
   const [error, setError] = useState("");
 
-  const router = useRouter();
+  const navigation = useNavigation();
 
   const handleNext = () => {
     if (resetOption === "email") {
@@ -57,26 +63,36 @@ export const ForgotPassword = ({ onCancel }: ForgotPasswordProps) => {
         <Text style={styles.subText}>
           De que forma você quer redefinir sua senha?
         </Text>
+
+        {/* Input de rádio para escolher entre email e celular */}
         <View style={styles.radioContainer}>
           <TouchableOpacity
-            style={[styles.radioButton, resetOption === "email" && styles.radioButtonSelected]}
+            style={styles.radioButton}
             onPress={() => {
               setResetOption("email");
               setError("");
             }}
           >
+            <View style={styles.radioCircle}>
+              {resetOption === "email" && <View style={styles.selectedRb} />}
+            </View>
             <Text style={styles.radioText}>Email</Text>
           </TouchableOpacity>
+
           <TouchableOpacity
-            style={[styles.radioButton, resetOption === "text" && styles.radioButtonSelected]}
+            style={styles.radioButton}
             onPress={() => {
               setResetOption("text");
               setError("");
             }}
           >
+            <View style={styles.radioCircle}>
+              {resetOption === "text" && <View style={styles.selectedRb} />}
+            </View>
             <Text style={styles.radioText}>Mensagem de texto</Text>
           </TouchableOpacity>
         </View>
+
         {resetOption === "email" ? (
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Insira seu email</Text>
@@ -99,19 +115,27 @@ export const ForgotPassword = ({ onCancel }: ForgotPasswordProps) => {
               style={styles.input}
               value={phone}
               onChangeText={(masked, unmasked) => {
-                setPhone(unmasked); // Use unmasked para obter o valor sem a máscara
+                setPhone(unmasked);
                 setError("");
               }}
-              mask={['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+              mask={[
+                "(",/\d/,/\d/,")"," ",/\d/,/\d/,/\d/,/\d/,/\d/,"-",/\d/,/\d/,/\d/,/\d/,]}
               placeholder="Digite seu telefone"
               placeholderTextColor="#999"
               keyboardType="phone-pad"
             />
           </View>
         )}
+
         {error && <Text style={styles.errorText}>{error}</Text>}
-        <Buttons onCancel={() => router.push("/login")} onNext={handleNext}>
-          {resetOption === "email" ? "Continuar por email" : "Continuar por mensagem"}
+
+        <Buttons
+          onCancel={() => navigation.navigate("Login")}
+          onNext={handleNext}
+        >
+          {resetOption === "email"
+            ? "Continuar por email"
+            : "Continuar por mensagem"}
         </Buttons>
       </View>
     </View>
@@ -120,67 +144,82 @@ export const ForgotPassword = ({ onCancel }: ForgotPasswordProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
     padding: 16,
   },
   card: {
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     borderRadius: 8,
     padding: 16,
-    width: '100%',
-    maxWidth: 400,
+    width: "98%",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
+    fontWeight: "bold",
+    color: "white",
     marginBottom: 8,
   },
   subText: {
     fontSize: 14,
-    color: 'white',
+    color: "white",
     marginBottom: 16,
-    textAlign: 'center',
+    textAlign: "center",
   },
   radioContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 16,
+
   },
   radioButton: {
-    borderWidth: 1,
-    borderColor: 'white',
-    borderRadius: 8,
-    padding: 12,
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1,
     marginHorizontal: 4,
-    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: "white",
+    paddingRight: 18,
+    paddingLeft: 12,
+    paddingVertical: 12,
+    width: 162,
+    borderRadius: 8,
   },
-  radioButtonSelected: {
-    backgroundColor: 'white',
+  radioCircle: {
+    height: 20,
+    width: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "white",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 8,
+  },
+  selectedRb: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "white",
   },
   radioText: {
-    color: 'white',
+    color: "white",
   },
   inputContainer: {
     marginBottom: 16,
   },
   label: {
     fontSize: 14,
-    color: 'white',
+    color: "white",
     marginBottom: 8,
   },
   input: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
   },
   errorText: {
-    color: 'red',
+    color: "red",
     fontSize: 14,
     marginBottom: 16,
   },

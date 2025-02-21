@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Importando ícones do FontAwesome
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'; // Importando ícones do MaterialIcons
 import AddCode from './addCode';
-import Buttons from '../Buttons/index';
+import Buttons from '../Buttons/buttons';
 
 interface ConfirmCodeProps {
   resetOption: "email" | "text";
@@ -23,7 +23,7 @@ const ConfirmCode = ({ resetOption, contactInfo }: ConfirmCodeProps) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordResetSuccess, setPasswordResetSuccess] = useState(false);
 
-  const router = useRouter();
+  const navigation = useNavigation();
 
   const handleCodeComplete = (code: string) => {
     setCode(code);
@@ -44,7 +44,7 @@ const ConfirmCode = ({ resetOption, contactInfo }: ConfirmCodeProps) => {
   };
 
   const handleBack = () => {
-    router.push("/forgot-password");
+    navigation.navigate("Login");
     setIsSuccess(false);
   };
 
@@ -64,15 +64,15 @@ const ConfirmCode = ({ resetOption, contactInfo }: ConfirmCodeProps) => {
       <View style={styles.card}>
         {passwordResetSuccess ? (
           <View style={styles.center}>
-            <Text style={styles.successText}>Nova senha criada com sucesso!</Text>
+            <Text style={styles.successText}>Nova senha criada  com sucesso!</Text>
             <Text style={styles.subText}>
-              Sua senha foi atualizada com sucesso, agora sempre que for entrar em um novo dispositivo, use sua nova senha.
+              Sua senha foi atualizada com sucesso.{"\n"}
+              agora sempre que for entrar em um novo{"\n"}
+              dispositivo, use sua nova senha.{"\n"}
             </Text>
-            <Buttons
-              children="Ir para página de login"
-              onCancel={() => router.push("/forgot-password")}
-              onNext={() => router.push("/login")}
-            />
+            <TouchableOpacity onPress={handleBack}>
+              <Text style={styles.button}>Ir para página de login</Text>
+            </TouchableOpacity>
           </View>
         ) : showResetPassword ? (
           <View>
@@ -163,33 +163,33 @@ const ConfirmCode = ({ resetOption, contactInfo }: ConfirmCodeProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    padding: 16,
+    // padding: 16,
   },
   card: {
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    // backgroundColor: 'rgba(0, 0, 0, 0.6)',
     borderRadius: 8,
     padding: 16,
-    width: '100%',
+    // width: '100%',
     maxWidth: 400,
   },
   center: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   successText: {
-    fontSize: 24,
+    fontSize: 30,
     fontWeight: 'bold',
     color: 'white',
     marginBottom: 8,
   },
   subText: {
-    fontSize: 14,
+    fontSize: 16,
     color: 'white',
     marginBottom: 16,
-    textAlign: 'center',
+    textAlign: 'justify',
   },
   title: {
     fontSize: 20,
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
   icon: {
     position: 'absolute',
     right: 8,
-    top: 8,
+    top: '50%',
   },
   errorContainer: {
     flexDirection: 'row',
@@ -239,6 +239,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textDecorationLine: 'underline',
     marginTop: 16,
+  },
+  button : {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    alignItems: 'center',
+    textAlign: 'center',
+    padding: 12,
+    fontSize: 14,
+    width: 348,
+    color: 'black',
+    fontWeight: 'bold',
   },
 });
 
