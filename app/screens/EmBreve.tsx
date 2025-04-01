@@ -8,33 +8,22 @@ import {
   Modal,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  Image,
 } from "react-native";
-import Carrossel, { Movie } from "@/components/Carrosel/Carrosel";
+import { lista, Movie } from "@/components/Carrosel/Carrosel";
 import NavCima from "@/components/NavBarCima/NavBarCima";
 import NavBaixo from "@/components/NavBarBaixo/navBarBaixo";
-import VideoPlayerHome from "@/components/VideoPlayerHome/videoPlayerHome";
 import ModalComponent from "@/components/Modal/modal";
 import { NotificationProvider } from "@/contexts/NotificationContext";
+import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
+import VideoPlayerHome from "@/components/VideoPlayerHome/videoPlayerHome";
 
-const generos = [
-  { id: "Minha-lista", title: "Minha lista" },
-  { id: "Ação", title: "Ação" },
-  { id: "Animação", title: "Animação" },
-  { id: "Aventura", title: "Aventura" },
-  { id: "Comédia", title: "Comédia" },
-  { id: "Drama", title: "Drama" },
-  { id: "Ficção Científica", title: "Ficção Científica" },
-  { id: "Fantasia", title: "Fantasia" },
-  { id: "Mistério", title: "Mistério" },
-  { id: "Romance", title: "Romance" },
-  { id: "Terror", title: "Terror" },
-];
-
-const Home = () => {
+const EmBreve = () => {
   const [scrolled, setScrolled] = useState(false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
-  const [menuOpen, setMenuOpen] = useState(true);
+  const navigation = useNavigation();
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offsetY = event.nativeEvent.contentOffset.y;
@@ -55,29 +44,39 @@ const Home = () => {
     setSelectedMovie(null);
   };
 
+  const returnHome = () => {
+    navigation.goBack();
+  };
+
   return (
     <NotificationProvider>
-
       <View style={styles.container}>
-        <View style={styles.navCimaContainer}>
-          <NavCima menuIsOpen={menuOpen} />
+        <View style={[styles.navCimaContainer, scrolled && styles.scrolledNav]}>
+          <NavCima menuIsOpen={false} />
         </View>
+
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
           onScroll={handleScroll}
           scrollEventThrottle={16}
         >
-          <View style={styles.videoContainer}>
-            <VideoPlayerHome
-              src="https://www.w3schools.com/html/mov_bbb.mp4"
-              type="mp4" modalIsOpen={false}          />
+          <View style={styles.header}>
+            <TouchableOpacity onPress={returnHome} style={styles.closeButton}>
+              <Ionicons name="close-circle" size={32} color="white" />
+            </TouchableOpacity>
+            <Text style={styles.title}>Em Breve</Text>
           </View>
 
-          <View style={styles.carrosselContainer}>
-            {generos.map((genero) => (
-              <View key={genero.id} style={styles.carrosselItem}>
-                <Carrossel genero={genero.title} modalIsOpen={openModal} />
-              </View>
+          <View style={styles.grid}>
+            {lista.map((filme) => (
+              <TouchableOpacity
+                key={filme.id}
+                onPress={() => openModal(filme as Movie)}
+                style={styles.card}
+              >
+                <Image source={{ uri: filme.image }} style={styles.cardImage} />
+                <Text style={styles.cardTitle}>{filme.title}</Text>
+              </TouchableOpacity>
             ))}
           </View>
         </ScrollView>
@@ -96,7 +95,9 @@ const Home = () => {
                 src={selectedMovie.src}
                 titulos={selectedMovie.title}
                 lancamento={selectedMovie.lancamento}
-                tipo={selectedMovie.tipo}
+                tipo={
+                  selectedMovie.tipo ?? "Filme" === "Filme" ? "Filme" : "Série"
+                }
                 duracao={selectedMovie.duracao}
                 cassificacao={selectedMovie.cassificacao}
                 descricao={selectedMovie.descricao}
@@ -117,35 +118,64 @@ const Home = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "black",
+    backgroundColor: "#1C1B1B",
   },
   scrollContainer: {
     flexGrow: 1,
     alignItems: "center",
-    paddingBottom: 80, // Adiciona espaço para a navbar inferior
+    paddingBottom: 80,
   },
   navCimaContainer: {
     width: "100%",
     position: "relative",
     top: 0,
     zIndex: 40,
+    backgroundColor: "black",
+  },
+  videoContainer: {
+    width: "100%",
+    marginBottom: 20,
   },
   scrolledNav: {
     backgroundColor: "rgba(0, 0, 0, 0.9)",
   },
-  transparentNav: {
-    backgroundColor: "transparent",
-  },
-  videoContainer: {
+  header: {
     width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    marginTop: 20,
+    marginBottom: 20,
   },
-  carrosselContainer: {
+  closeButton: {
+    marginRight: 16,
+  },
+  title: {
+    fontSize: 24,
+    color: "white",
+    fontWeight: "bold",
+  },
+  grid: {
     width: "100%",
-    marginTop: 30,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
     paddingHorizontal: 10,
   },
-  carrosselItem: {
-    marginBottom: 30,
+  card: {
+    width: "45%",
+    marginBottom: 20,
+  },
+  cardImage: {
+    width: "100%",
+    height: 150,
+    borderRadius: 10,
+  },
+  cardTitle: {
+    color: "white",
+    marginTop: 10,
+    fontSize: 16,
+    textAlign: "center",
   },
   navBaixoContainer: {
     width: "100%",
@@ -157,7 +187,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
   },
 });
 
-export default Home;
+export default EmBreve;

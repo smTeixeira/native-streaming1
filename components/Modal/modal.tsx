@@ -7,7 +7,6 @@ import {
   StyleSheet,
   Dimensions,
   ScrollView,
-  FlatList, // Use o FlatList do react-native
 } from "react-native";
 import { Video } from "expo-av";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -25,7 +24,7 @@ export interface ModalProps {
   id?: string;
   titulos?: string;
   lancamento: string;
-  tipo: "Filme" | "Serie";
+  tipo: "Filme" | "Série";
   duracao: string;
   genero?: string;
   cassificacao: string;
@@ -67,7 +66,7 @@ const ModalComponent: React.FC<ModalProps> = ({ onClose, ...props }) => {
   };
 
   return (
-    <Modal transparent={false} animationType="slide" visible={true}>
+    <View>
       <View style={styles.modalContainer}>
         <ScrollView contentContainerStyle={styles.modalContent}>
           <View style={styles.closeButtonContainer}>
@@ -122,7 +121,7 @@ const ModalComponent: React.FC<ModalProps> = ({ onClose, ...props }) => {
 
             <Text style={styles.description}>{props.descricao}</Text>
 
-            {props.isSoon === false && props.tipo === "Serie" && (
+            {props.isSoon === false && props.tipo === "Série" && (
               <View style={styles.carrosselEpContainer}>
                 <CarrosselEp
                   px="0"
@@ -132,6 +131,10 @@ const ModalComponent: React.FC<ModalProps> = ({ onClose, ...props }) => {
                 />
               </View>
             )}
+
+            <View style={styles.containerVideo}>
+
+            </View>
 
             <View style={styles.suggestionsContainer}>
               <Carrossel genero="Sugestões para você" modalIsOpen={onClose} />
@@ -168,7 +171,7 @@ const ModalComponent: React.FC<ModalProps> = ({ onClose, ...props }) => {
           </View>
         </ScrollView>
       </View>
-    </Modal>
+    </View>
   );
 };
 

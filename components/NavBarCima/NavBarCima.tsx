@@ -8,20 +8,30 @@ import {
   ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import Icon from "react-native-vector-icons/FontAwesome6";
+import NotificationBell from "./notification";
+import { useNotification } from "@/contexts/NotificationContext";
 
-const Navbar: React.FC = () => {
+interface NavItem {
+  menuIsOpen: boolean;
+}
+
+const Navbar: React.FC<NavItem> = ({ menuIsOpen }) => {
   const navigation = useNavigation();
-  const [menuOpen, setMenuOpen] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { addNotification } = useNotification();
+
+  const handleAddNotification = () => {
+    addNotification('Nova notificação!');
+  };
 
   const navItems = [
     { link: "Destaques", path: "Home" },
     { link: "Minha lista", path: "MyList" },
-    { link: "Filmes", path: "Movies" },
+    { link: "Filmes", path: "Filmes" },
     { link: "Series", path: "Series" },
     { link: "Noticias", path: "News" },
     { link: "Documentários", path: "Documentaries" },
-    { link: "Em breve", path: "ComingSoon" },
+    { link: "Em breve", path: "EmBreve" },
     { link: "Conheça o mãos tagarelas", path: "About" },
   ];
 
@@ -39,27 +49,30 @@ const Navbar: React.FC = () => {
           />
         </TouchableOpacity>
 
-        <View style={styles.iconsContainer}>
-          <TouchableOpacity onPress={toggleMenu}>
-
-          </TouchableOpacity>
+        <View>
+          <NotificationBell />
         </View>
       </View>
-      {menuOpen && (
-        <ScrollView horizontal={true} style={styles.menu}>
-          {navItems.map(({ link, path }) => (
-            <TouchableOpacity
-              key={link}
-              onPress={() => {
-                navigation.navigate(path);
-              }}
-              style={styles.menuItem}
-            >
-              <Text style={styles.menuText}>{link}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      )}
+
+      <ScrollView
+        horizontal={true}
+        style={[
+          styles.menu,
+          menuIsOpen ? styles.menuVisible : styles.menuHidden,
+        ]}
+      >
+        {navItems.map(({ link, path }) => (
+          <TouchableOpacity
+            key={link}
+            onPress={() => {
+              navigation.navigate(path);
+            }}
+            style={styles.menuItem}
+          >
+            <Text style={styles.menuText}>{link}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
     </>
   );
 };
@@ -70,19 +83,18 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#1C1B1B",
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    paddingTop: 45,
+    paddingBottom: 15,
+    paddingHorizontal: 10,
   },
   logo: {
     height: 55,
     width: 100,
     resizeMode: "contain",
-    marginTop: 30,
   },
   iconsContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 20,
     marginTop: 30,
   },
   menu: {
@@ -90,6 +102,12 @@ const styles = StyleSheet.create({
     padding: 10,
     flexDirection: "row",
     zIndex: 1,
+  },
+  menuVisible: {
+    display: "flex", 
+  },
+  menuHidden: {
+    display: "none", 
   },
   menuItem: {
     paddingHorizontal: 10,

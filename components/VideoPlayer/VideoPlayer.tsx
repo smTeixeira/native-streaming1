@@ -6,80 +6,45 @@ import {
   StyleSheet,
   Dimensions,
   Modal,
+  TouchableWithoutFeedback,
+  StatusBar,
 } from "react-native";
-import { Video } from "expo-av";
+import { Video, ResizeMode } from "expo-av";
 import { Ionicons, MaterialIcons, FontAwesome } from "@expo/vector-icons";
 import CarrosselEp from "@/components/Carrosel/CarroselEp";
 import { useNavigation } from "expo-router";
-import * as ScreenOrientation from 'expo-screen-orientation';
-
-export const temporadas = [
-  {
-    title: "Temporada 1",
-    episodes: [
-      {
-        title: "Pilot",
-        description: "Leonard e Sheldon conhecem a vizinha Penny.",
-        image: require("../../assets/imagens/image1.jpg"),
-      },
-      {
-        title: "The Big Bran Hypothesis",
-        description: "Sheldon reorganiza o apartamento de Penny.",
-        image: require("../../assets/imagens/image2.jpg"),
-      },
-      {
-        title: "The Fuzzy Boots Corollary",
-        description: "Leonard pede Penny para sair.",
-        image: require("../../assets/imagens/image3.jpg"),
-      },
-    ],
-  },
-  {
-    title: "Temporada 2",
-    episodes: [
-      {
-        title: "The Bad Fish Paradigm",
-        description:
-          "Penny e Leonard lidam com as consequências do primeiro encontro.",
-        image: require("../../assets/imagens/image4.jpg"),
-      },
-      {
-        title: "The Codpiece Topology",
-        description: "Leonard começa a namorar Leslie Winkle.",
-        image: require("../../assets/imagens/image5.jpg"),
-      },
-      {
-        title: "The Barbarian Sublimation",
-        description: "Sheldon vicia Penny em um videogame online.",
-        image: require("../../assets/imagens/image4.jpg"),
-      },
-    ],
-  },
-];
+import * as ScreenOrientation from "expo-screen-orientation";
+import * as NavigationBar from "expo-navigation-bar";
+import { temporadas } from "../VideoPlayerHome/videoPlayerHome";
 
 interface IVideoPlayer {
   tipo: "Filme" | "Série";
+  url: string;
 }
 
-const VideoPlayer: React.FC<IVideoPlayer> = ({ tipo }) => {
+const VideoPlayer: React.FC<IVideoPlayer> = ({ tipo, url }) => {
   const videoRef = useRef<Video>(null);
-  const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [controlsVisible, setControlsVisible] = useState(true);
-  const [episodios, setEpisodios] = useState(false);
+  const [progress, setProgress] = useState<number>(0);
+  const [duration, setDuration] = useState<number>(0);
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [controlsVisible, setControlsVisible] = useState<boolean>(true);
+  const [episodios, setEpisodios] = useState<boolean>(false);
 
   const navigation = useNavigation();
 
   useEffect(() => {
-    // Configura a orientação da tela para landscape ao entrar
     ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
 
-    // Retorna a orientação para portrait ao sair
+    StatusBar.setHidden(true);
+
+    NavigationBar.setVisibilityAsync("hidden");
+
     return () => {
       ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+      StatusBar.setHidden(false);
+      NavigationBar.setVisibilityAsync("visible");
     };
   }, []);
 
@@ -88,19 +53,25 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({ tipo }) => {
       if (isPlaying) {
         setControlsVisible(false);
       }
-    }, 3000);
+    }, 4000);
 
     return () => clearTimeout(hideControlsTimeout);
   }, [isPlaying]);
 
-  const handleTimeUpdate = (status) => {
+  useEffect(() => {
+    if (isPlaying) {
+      ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
+    }
+  }, [isPlaying]);
+
+  const handleTimeUpdate = (status: any) => {
     if (!status.isLoaded) return;
     setCurrentTime(status.positionMillis);
     setDuration(status.durationMillis);
     setProgress((status.positionMillis / status.durationMillis) * 100);
   };
 
-  const handleSeek = (event) => {
+  const handleSeek = (event: any) => {
     if (videoRef.current) {
       const { locationX } = event.nativeEvent;
       const seekTime = (locationX / Dimensions.get("window").width) * duration;
@@ -141,7 +112,7 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({ tipo }) => {
     }
   };
 
-  const formatTime = (time) => {
+  const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60000);
     const seconds = Math.floor((time % 60000) / 1000);
     return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
@@ -151,31 +122,48 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({ tipo }) => {
     setEpisodios(!episodios);
   };
 
+  const handleScreenPress = () => {
+    setControlsVisible(true);
+    setTimeout(() => {
+      if (isPlaying) {
+        setControlsVisible(false);
+      }
+    }, 3000);
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back-circle" size={24} color="white" />
-          <Text style={styles.backText}>Voltar</Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>{tipo}: The Big Bang Theory</Text>
-        <TouchableOpacity>
-          <MaterialIcons name="settings" size={24} color="white" />
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.videoContainer}>
-        <Video
-          ref={videoRef}
-          source={{ uri: "https://www.w3schools.com/html/mov_bbb.mp4" }}
-          style={styles.video}
-          resizeMode="cover"
-          shouldPlay={isPlaying}
-          isMuted={isMuted}
-          onPlaybackStatusUpdate={handleTimeUpdate}
-        />
-      </View>
-
+      <StatusBar hidden />
+      {controlsVisible && (
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <Ionicons name="arrow-back-circle" size={24} color="white" />
+            <Text style={styles.backText}>Voltar</Text>
+          </TouchableOpacity>
+          <Text style={styles.title}>{tipo}: The Big Bang Theory</Text>
+          <TouchableOpacity>
+            <MaterialIcons name="settings" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+      )}
+      <TouchableWithoutFeedback onPress={handleScreenPress}>
+        <View style={styles.videoContainer}>
+          <Video
+            ref={videoRef}
+            source={{
+              uri: url, // Usa a URL passada como prop
+            }}
+            style={styles.video}
+            resizeMode={ResizeMode.COVER}
+            shouldPlay={isPlaying}
+            isMuted={isMuted}
+            onPlaybackStatusUpdate={handleTimeUpdate}
+          />
+        </View>
+      </TouchableWithoutFeedback>
       {controlsVisible && (
         <View style={styles.controls}>
           <TouchableOpacity onPress={handleRewind}>
@@ -193,42 +181,45 @@ const VideoPlayer: React.FC<IVideoPlayer> = ({ tipo }) => {
           </TouchableOpacity>
         </View>
       )}
+      {controlsVisible && (
+        <>
+          <View style={styles.progressContainer}>
+            <View style={styles.progressBar}>
+              <View style={[styles.progress, { width: `${progress}%` }]} />
+            </View>
+            <Text style={styles.timeText}>
+              {formatTime(currentTime)} / {formatTime(duration)}
+            </Text>
+          </View>
 
-      <View style={styles.progressContainer}>
-        <View style={styles.progressBar}>
-          <View style={[styles.progress, { width: `${progress}%` }]} />
-        </View>
-        <Text style={styles.timeText}>
-          {formatTime(currentTime)} / {formatTime(duration)}
-        </Text>
-      </View>
+          <Modal visible={episodios} transparent={true} animationType="slide">
+            <View style={styles.modalContainer}>
+              <CarrosselEp
+                showCloseButton={true}
+                temporadas={temporadas}
+                onClose={openEpisodios}
+                px="20px"
+                py="40px"
+              />
+            </View>
+          </Modal>
 
-      <Modal visible={episodios} transparent={true} animationType="slide">
-        <View style={styles.modalContainer}>
-          <CarrosselEp
-            showCloseButton={true}
-            temporadas={temporadas}
-            onClose={openEpisodios}
-            px="20px"
-            py="40px"
-          />
-        </View>
-      </Modal>
-
-      <View style={styles.bottomControls}>
-        {tipo === "Série" && (
-          <TouchableOpacity onPress={openEpisodios}>
-            <MaterialIcons name="collections" size={24} color="white" />
-          </TouchableOpacity>
-        )}
-        <TouchableOpacity onPress={toggleMute}>
-          {isMuted ? (
-            <MaterialIcons name="volume-off" size={24} color="white" />
-          ) : (
-            <MaterialIcons name="volume-up" size={24} color="white" />
-          )}
-        </TouchableOpacity>
-      </View>
+          <View style={styles.bottomControls}>
+            {tipo === "Série" && (
+              <TouchableOpacity onPress={openEpisodios}>
+                <MaterialIcons name="collections" size={24} color="white" />
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity onPress={toggleMute}>
+              {isMuted ? (
+                <MaterialIcons name="volume-off" size={24} color="white" />
+              ) : (
+                <MaterialIcons name="volume-up" size={24} color="white" />
+              )}
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
     </View>
   );
 };
@@ -237,10 +228,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "black",
-    flexDirection: "row",
   },
   header: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
@@ -271,13 +261,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   video: {
-    width: Dimensions.get('window').height,
-    height: Dimensions.get('window').width,
-    transform: [{ rotate: '90deg' }],
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height,
   },
   controls: {
     position: "absolute",
-    top: '40%',
+    top: "40%",
     left: 0,
     right: 0,
     flexDirection: "row",
@@ -285,7 +274,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   progressContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 60,
     left: 0,
     right: 0,
@@ -313,7 +302,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.8)",
   },
   bottomControls: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,

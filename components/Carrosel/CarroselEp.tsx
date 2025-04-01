@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Dimensions } from "react-native";
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, Dimensions, Modal } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome6";
 import { MaterialIcons } from "@expo/vector-icons";
 import Card from "../Card/Card";
@@ -54,7 +54,7 @@ const CarrosselEp: React.FC<CarrosselEpProps> = ({
         </View>
       )}
 
-      <View style={{ paddingVertical: py ? parseInt(py) : 0, paddingHorizontal: px ? parseInt(px) : 0 }}>
+      <View style={[styles.padding, { paddingVertical: py ? parseInt(py) : 0, paddingHorizontal: px ? parseInt(px) : 0 }]}>        
         <View style={styles.header}>
           <Text style={styles.headerText}>Episódios</Text>
           <TouchableOpacity onPress={() => setSeasons(!seasons)} style={styles.seasonSelector}>
@@ -73,29 +73,24 @@ const CarrosselEp: React.FC<CarrosselEpProps> = ({
         />
       </View>
 
-      {seasons && (
-        <View style={styles.seasonsModal}>
-          <View style={styles.seasonsModalHeader}>
-            <TouchableOpacity onPress={() => setSeasons(false)}>
-              <MaterialIcons name="close" size={32} color="#FFF" />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.seasonsListContainer}>
+      <Modal visible={seasons} animationType="fade" transparent>
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity style={styles.closeModalButton} onPress={() => setSeasons(false)}>
+            <MaterialIcons name="close" size={32} color="white" />
+          </TouchableOpacity>
+          <View style={styles.modalContent}>
             <FlatList
               data={temporadas}
               keyExtractor={(item, index) => index.toString()}
               renderItem={({ item, index }) => (
-                <TouchableOpacity
-                  onPress={() => handleSeasonSelect(index)}
-                  style={styles.seasonItem}
-                >
+                <TouchableOpacity onPress={() => handleSeasonSelect(index)} style={styles.seasonItem}>
                   <Text style={styles.seasonItemText}>{item.title}</Text>
                 </TouchableOpacity>
               )}
             />
           </View>
         </View>
-      )}
+      </Modal>
     </View>
   );
 };
@@ -148,24 +143,28 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 5,
   },
-  seasonsModal: {
+  carouselContent: {
+    paddingHorizontal: 8,
+  },
+  modalOverlay: {
     position: "absolute",
     top: 0,
     left: 0,
     width: "100%",
     height: "100%",
-    backgroundColor: "#000",
-    zIndex: 20,
+    backgroundColor: "rgba(0, 0, 0, 0.9)",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  seasonsModalHeader: {
+  closeModalButton: {
     position: "absolute",
     top: 20,
     right: 20,
   },
-  seasonsListContainer: {
-    flex: 1,
+  modalContent: {
+    width: 428,
+    height: 300,
     justifyContent: "center",
-    alignItems: "center",
   },
   seasonItem: {
     marginBottom: 20,
@@ -173,9 +172,7 @@ const styles = StyleSheet.create({
   seasonItemText: {
     color: "#FFF",
     fontSize: 16,
-  },
-  carouselContent: {
-    paddingHorizontal: 8, // Adiciona um pouco de espaço nas laterais
+    textAlign: "center",
   },
 });
 

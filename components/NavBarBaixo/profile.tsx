@@ -1,10 +1,13 @@
+import { useNavigation } from "expo-router";
 import React from "react";
 import { TouchableOpacity, Text, StyleSheet, Image } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome6";
 
 const Profile: React.FC = () => {
+
+  const navigation = useNavigation();
+
   return (
-    <TouchableOpacity style={styles.profileIcon}>
+    <TouchableOpacity style={styles.profileIcon} onPress={() => navigation.navigate("MinhaHandsplay")}>
       <Image
         source={require("../../assets/profile.png")}
         style={{ width: 32, height: 32 }}

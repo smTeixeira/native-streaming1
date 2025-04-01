@@ -9,8 +9,8 @@ export const lista = [
     image: "https://picsum.photos/160/98",
     src: "https://www.w3schools.com/html/mov_bbb.mp4",
     lancamento: "2022",
-    tipo: "Filme",
-    duracao: "2h 30m",
+    tipo: "Filme" as "Filme",
+    duracao: "2h 31m",
     genero: "Ação",
     cassificacao: "14",
     descricao: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
@@ -22,7 +22,7 @@ export const lista = [
     image: "https://picsum.photos/160/121",
     src: "https://www.w3schools.com/html/mov_bbb.mp4",
     lancamento: "2022",
-    tipo: "Serie",
+    tipo: "Serie" as "Serie",
     duracao: "2h 30m",
     genero: "Ação",
     cassificacao: "14",
@@ -49,12 +49,26 @@ interface CarrosselProps {
   genero?: string;
 }
 
+export interface Movie {
+  id: number;
+  title: string;
+  image: string;
+  src: string;
+  lancamento: string;
+  tipo?: "Filme" | "Serie";
+  duracao: string;
+  genero: string;
+  cassificacao: string;
+  descricao: string;
+  elenco: string;
+}
+
 const { width: screenWidth } = Dimensions.get('window');
 
 const Carrossel: React.FC<CarrosselProps> = ({ modalIsOpen, genero }) => {
   const flatListRef = useRef<FlatList>(null);
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({ item }: { item: Movie }) => {
     return (
       <TouchableOpacity onPress={() => modalIsOpen?.(item)}>
         <Image source={{ uri: item.image }} style={styles.image} />
